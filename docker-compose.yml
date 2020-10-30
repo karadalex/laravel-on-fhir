@@ -1,0 +1,44 @@
+version: '3.2'
+
+
+services:
+
+  roach1:
+    container_name: roach1
+    hostname: roach1
+    image: cockroachdb/cockroach:latest
+    command: start --cluster-name=laravel-on-fhir --logtostderr=WARNING --log-file-verbosity=WARNING --insecure
+    ports:
+      - 26257:26257 
+      - 8080:8080
+    networks:
+      - roachnet
+    volumes:
+      - ${PWD}/docker/cockroach-data/roach1:/cockroach/cockroach-data
+
+  roach2:
+    container_name: roach2
+    hostname: roach2
+    image: cockroachdb/cockroach:latest
+    command: start --cluster-name=laravel-on-fhir --logtostderr=WARNING --log-file-verbosity=WARNING --insecure --join=roach1,roach2,roach3
+    depends_on:
+      - roach1
+    networks:
+      - roachnet
+    volumes:
+      - ${PWD}/docker/cockroach-data/roach2:/cockroach/cockroach-data
+
+  roach3:
+    container_name: roach3
+    hostname: roach3
+    image: cockroachdb/cockroach:latest
+    command: start --cluster-name=laravel-on-fhir --logtostderr=WARNING --log-file-verbosity=WARNING --insecure --join=roach1,roach2,roach3
+    depends_on:
+      - roach1
+    networks:
+      - roachnet
+    volumes:
+      - ${PWD}/docker/cockroach-data/roach3:/cockroach/cockroach-data
+
+networks:
+  roachnet:
