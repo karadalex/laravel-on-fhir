@@ -11,3 +11,10 @@ These are the steps to connect to the CockroachDB insecure cluster running local
 4. Start a new SQL session `cockroach sql --insecure`
 5. Create the database `CREATE DATABASE laravel_on_fhir;`
 6. Exit from sql and container and then run the migrations `php artisan migrate`
+
+Manually set user as admin:
+```sql
+use laravel_on_fhir;
+update users set role_id = (select id from roles where name = 'admin') where email = 'email@example.com';
+exit
+```
